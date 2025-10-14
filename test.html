@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CORS Test</title>
+    <style>
+        body { font-family: sans-serif; padding: 2em; }
+        button { font-size: 1.2em; padding: 0.5em 1em; }
+        pre { background-color: #eee; padding: 1em; border: 1px solid #ccc; white-space: pre-wrap; word-wrap: break-word; }
+    </style>
+</head>
+<body>
+    <h1>Supabase CORS Test</h1>
+    <p>Open the browser console (F12) and click the button. Check the console for CORS errors.</p>
+    <button id="testButton">Test Hello World</button>
+    <h2>Result:</h2>
+    <pre id="result">Click the button to test...</pre>
+
+    <script>
+        const testButton = document.getElementById('testButton');
+        const resultElement = document.getElementById('result');
+
+        // --- IMPORTANT: Replace with your actual Supabase URL and Anon Key ---
+        const SUPABASE_URL = 'https://rmjletizmgailtitmv.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJtamxldGkzbWdhaWxldGktdG12Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Mjc2OTYxODMsImV4cCI6MjA0MzI3MjE4M30.bS7y-w-i-or7yrvSjs15f-mX2q-eB-I-L1I9M6rK4sY';
+        
+        // --- UPDATED: Pointing to the simpler hello-world function ---
+        const FUNCTION_URL = `${SUPABASE_URL}/functions/v1/hello-world`;
+
+        testButton.addEventListener('click', async () => {
+            resultElement.textContent = 'Sending request...';
+            console.log('Sending request to:', FUNCTION_URL);
+
+            try {
+                const response = await fetch(FUNCTION_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (!response.ok) {
+                    // Try to get more detailed error text from the response if possible
+                    const errorText = await response.text();
+                    throw new Error(`Network response was not ok. Status: ${response.status}. Body: ${errorText}`);
+                }
+
+                const data = await response.json();
+                resultElement.textContent = JSON.stringify(data, null, 2);
+                console.log('Success:', data);
+
+            } catch (error) {
+                resultElement.textContent = `Error: ${error.message}\n\n(See browser console for more details)`;
+                console.error('Fetch Error:', error);
+            }
+        });
+    </script>
+</body>
+</html>
+
